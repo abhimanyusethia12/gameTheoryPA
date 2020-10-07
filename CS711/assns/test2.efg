@@ -1,0 +1,11 @@
+EFG 2 R "Untitled Extensive Game" { "Player 1" "Player 2" }
+""
+p "" 1 1 "" { "Greedy" "Fair" } 0
+p "" 2 1 "" { "Reject" "Accept" } 0
+t "2" 1 "" { 0, 0 }
+t "" 2 "" { 9, 1 }
+p "" 2 1 "" { "Reject" "Accept" } 0
+t "2" 3 "" { 0, 0 }
+t "" 4 "" { 5, 5 }
+Output :
+[[Greedy], [Accept, Accept]]
