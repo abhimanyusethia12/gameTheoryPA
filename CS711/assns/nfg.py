@@ -1,5 +1,3 @@
-import numpy as np
-
 class NFG():
   def __init__(self):
     self.gameType = "NFG"
@@ -35,9 +33,7 @@ class NFG():
             
       else:
         self.utils = list(map(int, x.split()))
-
-        print(self.utils)
         temp = [*self.strats]
-        temp[0] = self.strats[-1]
-        temp[-1] = self.strats[0]
-        self.utils = np.reshape(self.utils, (*temp, len(self.players))).swapaxes(0,-2) 
+        temp.reverse()
+        index = [*range(len(self.players)-1,-1,-1),len(self.players)]
+        self.utils = np.reshape(self.utils, (*temp, len(self.players))).transpose(*index)
