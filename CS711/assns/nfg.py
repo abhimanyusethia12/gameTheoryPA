@@ -37,3 +37,43 @@ class NFG():
         temp.reverse()
         index = [*range(len(self.players)-1,-1,-1),len(self.players)]
         self.utils = np.reshape(self.utils, (*temp, len(self.players))).transpose(*index)
+        
+x = NFG()
+x.preprocess("g1.nfg")
+        
+sdse = []
+for i in range(len(x.players)):
+  ut = x.utils[...,i]
+  ut = ut.swapaxes(-1,i).copy(order='C')
+  maxx = -1000000000
+  maxind = []
+  best = -2
+  
+  for l,j in enumerate(np.nditer(ut)):
+    if maxx == j:
+      maxind.append(l%x.strats[i])
+    elif maxx < j:
+      maxind = []
+      maxind.append(l%x.strats[i])
+      maxx = j
+    
+    if l%x.strats[i] == x.strats[i] - 1:
+      if len(maxind) != 1:
+        break
+      else:
+        if best == -2:
+          best = maxind[0]
+        elif best != maxind[0]:
+          best = -1
+          break
+        maxx = -1000000000
+        maxind = []
+
+  put = np.zeros(x.strats[i], dtype=np.int8)
+  if best >= 0:
+    put[best] = 1
+  put = list(put)
+  for p in put:
+    sdse.append(p)
+
+print(sdse)
