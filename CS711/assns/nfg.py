@@ -88,7 +88,7 @@ def WDSE(filename):
     ut = ut.swapaxes(-1,i).copy(order='C')
     maxx = -1000000000
     maxind = []
-    best = set([1 for i in range(x.strats[i])])
+    best = set([_ for _ in range(x.strats[i])])
     for l,j in enumerate(np.nditer(ut)):
       if maxx == j:
         maxind.append(l%x.strats[i])
