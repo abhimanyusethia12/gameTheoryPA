@@ -1,5 +1,3 @@
-import numpy as np
-
 class NFG():
   def __init__(self):
     self.gameType = "NFG"
@@ -78,9 +76,6 @@ def SDSE(filename):
     else:
       sdse.append(0)
 
-  if sum(sdse) !=  len(x.players) : 
-    sdse = [0]*sum(x.strats)
-
   return sdse
 
 def WDSE(filename):
@@ -118,10 +113,5 @@ def WDSE(filename):
         wdse.append(1)
       else:
         wdse.append(0)
-
-  if sum(wdse) !=  len(x.players) :
-    
-    wdse = [0]*sum(x.strats)
-    
 
   return wdse
