@@ -70,11 +70,11 @@ def SDSE(filename):
           maxx = -1000000000
           maxind = []
           
-  for k in range(x.strats[i]):
-    if k == best:
-      sdse.append(1)
-    else:
-      sdse.append(0)
+    for k in range(x.strats[i]):
+      if k == best:
+        sdse.append(1)
+      else:
+        sdse.append(0)
 
   return sdse
 
