@@ -32,11 +32,11 @@ class NFG():
               i = stratEnd + 1 
             
       else:
-        self.utils = list(map(int, x.split()))
+        self.utils = np.fromstring(x, dtype=np.int32, sep = ' ')
         temp = [*self.strats]
         temp.reverse()
         index = [*range(len(self.players)-1,-1,-1),len(self.players)]
-        self.utils = np.reshape(self.utils, (*temp, len(self.players))).transpose(*index)
+        self.utils = self.utils.reshape((*temp, len(self.players))).transpose(*index)
 
 def SDSE(filename):
   x = NFG()
@@ -98,11 +98,11 @@ def WDSE(filename):
         maxx = j
 
       if l%x.strats[i] == x.strats[i] - 1:
-          best = best.intersection(maxind)
-          if len(best) == 0:
-            break
-          maxx = -1000000000
-          maxind = []
+        best = best.intersection(maxind)
+        if len(best) == 0:
+          break
+        maxx = -1000000000
+        maxind = []
 
     put = -1
 
