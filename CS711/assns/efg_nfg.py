@@ -2,28 +2,29 @@ import numpy as np
 import copy
 
 def cartesianProduct(set_a, set_b): 
-	result =[] 
-	for i in range(0, len(set_a)): 
-		for j in range(0, len(set_b)): 
+  result =[]
+  for i in range(0, len(set_a)): 
+    for j in range(0, len(set_b)): 
 
-			if type(set_a[i]) != list:		 
-				dummy = [set_a[i]] 
-				
-			temp = [num for num in dummy] 
-			 
-			temp.append(set_b[j])			 
-			result.append(temp) 
-			
-	return result 
+      if type(set_a[i]) != list:		 
+        dummy = [set_a[i]] 
+      else:
+        dummy = set_a[i]
+      temp = [num for num in dummy] 
+       
+      temp.append(set_b[j])			 
+      result.append(temp) 
+      
+  return result 
 
 def Cartesian(list_a, n): 
-	
-	temp = list_a[0] 
-	
-	for i in range(1, n): 
-		temp = cartesianProduct(temp, list_a[i]) 
-		
-	return temp 
+  
+  temp = list_a[0] 
+  
+  for i in range(1, n): 
+    temp = cartesianProduct(temp, list_a[i]) 
+    
+  return temp 
 
 class EFG_general:
   
@@ -89,22 +90,23 @@ class Player:
         self.info_sets = {}
         self.dictionary = []
 
-def construct_tree(line_index, file_arr, d, players, curr = None):
+def construct_tree(line_index, file_arr, d, players, done, curr = None):
   if curr == None:
     curr = Node(file_arr[line_index])
   i = line_index
   if curr.node_type == 'p':
         curr_player = int(curr.player)-1
-        curr_infoset = curr.info_set
         curr_depth = d
         if curr_depth in players[curr_player].info_sets:
-            if len((players[curr_player].info_sets)[curr_depth]) < curr_infoset:
-                lis = []
-                for x in range (len(curr.actions)):
-                  lis.append(x)
-                (players[curr_player].info_sets)[curr_depth].append(lis)
+          if curr.info_set not in done[curr_player]:
+            done[curr_player].append(curr.info_set)
+            lis = []
+            for x in range (len(curr.actions)):
+              lis.append(x)
+            (players[curr_player].info_sets)[curr_depth].append(lis)
         else:
             (players[curr_player].info_sets)[curr_depth] = []
+            done[curr_player].append(curr.info_set)
             lis = []
             for x in range (len(curr.actions)):
               lis.append(x)
@@ -115,7 +117,7 @@ def construct_tree(line_index, file_arr, d, players, curr = None):
     child = Node(file_arr[i+1], action)
     curr.append_child(child)
     if (child.node_type == 'p'):
-      (i, _) = construct_tree(i+1, file_arr, d+1, players, child)
+      (i, _) = construct_tree(i+1, file_arr, d+1, players, done, child)
     i += 1
   return (i-1, curr)
 
@@ -164,10 +166,20 @@ def dfs(history, depth, player_actions, numPlayers, players, out) :
         for seq in final_list:
           small_indices.append(curr_player.dictionary.index(seq))
         indices.append(small_indices)
-    
-    final_indices = Cartesian(indices, len(indices))
-    for elem in final_indices:
-      out[tuple(elem)] = np.array(history.util)
+    if len(indices) == 1:
+      lis1 = indices
+      temp = []
+      for i in lis1:
+        temp.append([i])
+      final_indices = temp
+      for elem in final_indices:
+        temp1 = out[tuple(elem)]
+        temp2 = np.array(history.util)
+        out[tuple(elem)] = np.array(history.util)
+    else:        
+      final_indices = Cartesian(indices, len(indices))
+      for elem in final_indices:
+        out[tuple(elem)] = np.array(history.util)
   else:
     player = int(history.player)
     for i,a in enumerate(history.actions):
@@ -194,8 +206,11 @@ def efg_NFG(filename):
     for i in range (numPlayers):
         temp = Player()
         players.append(temp)
-
-    (_, root) = construct_tree(2, file_arr, 0, players)
+    
+    done = []
+    for i in range(numPlayers):
+      done.append([])
+    (_, root) = construct_tree(2, file_arr, 0, players, done)
 
     for player in players:
         lis = []
@@ -262,4 +277,4 @@ def efg_NFG(filename):
     final_ans.append(result)
     print(final_ans)
 
-efg_NFG('./test2.efg')
+efg_NFG('./efg_tests/test5.efg')
