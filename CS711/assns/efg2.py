@@ -113,10 +113,10 @@ def combine_action_sets(action_set1, action_set2) :
       action_set[i] = action_set1[i]
     else:
       #general case to be done
-      for k2, v2 in action_set2.items():
-        if k2 in action_set1:
+      for k2, v2 in action_set2[i].items():
+        if k2 in action_set1[i]:
           for a in v2:
-            action_set1[i][k].append(a)
+            action_set1[i][k2].append(a)
         action_set = action_set1
   return action_set
 
@@ -136,60 +136,69 @@ def BACKWARD_INDUCTION(history, num_players, depth=0):
   
   for action_index, action in enumerate(history.actions) :
     print('Taking action ', action)
-    #print(len(list_of_spne))
+    print(' at start ', len(list_of_spne))
     list_of_child_spne = BACKWARD_INDUCTION(history.children[action_index], num_players, depth+1)
     #print('size of current spne ',len(list_of_spne))
     if len(list_of_spne) == 0:
       print('Current spne list is empty')
       for s in list_of_child_spne : 
         temp = {}
-        #print(player, s.utilities)
+        print(player, s.utilities)
         temp[s.utilities[player]] = [action]
         #print('create util, action pair ', temp)
         best_action_set.append(temp)
-        #list_of_spne = list_of_child_spne
+        list_of_spne = list_of_child_spne
     
     else :
       temp_list_of_spne = []
       temp_best_action_set = []
       for i, s1 in enumerate(list_of_spne) :
         best_action = best_action_set[i]
+        print('spne not empty ', best_action)
         for s2 in list_of_child_spne :
           S = SPNE(num_players)
           S.player_actions = combine_action_sets(s1.player_actions, s2.player_actions)
-          #print('Combining ', S.player_actions)
+          print('Combining ', S.player_actions)
           temp = {}
 
           u = 1
           for k in best_action_set[i].keys():
             u = k
           if u > s2.utilities[player]:
+            S.utilities = list_of_spne[i].utilities
             temp_best_action_set.append(best_action)
           elif u < s2.utilities[player]:
+            S.utilities = s2.utilities
             temp[s2.utilities[player]] = action
             temp_best_action_set.append(temp) 
           else :
+            S.utilities = s2.utilities
             best_action.append(action)
             temp_best_action_set.append(temp)
           temp_list_of_spne.append(S)
       best_action_set = temp_best_action_set
       list_of_spne = temp_list_of_spne
+    print('at end ',list_of_spne[0].utilities)
 
   temp_spne = []
   for i, spne in enumerate(list_of_spne):
     k = 1
-    for i in best_action.keys():
-      k  = i
+    for u in best_action.keys():
+      k  = u
     #k = (best_action.keys())[0]
     if len(best_action[k]) == 1:
-      if depth in spne.player_actions[player-1]:
+      print('Single best action')
+      if depth in spne.player_actions[player]:
         spne.player_actions[player][depth].append(best_action[k])
       else:
         spne.player_actions[player][depth] = []
         spne.player_actions[player][depth].append(best_action[k])
+      print(spne.player_actions)
       temp_spne.append(spne)
+      print(i)
 
     else:
+      print('Multiple best actions')
       for a in best_action[k]:
         spne1 = copy.deepcopy(spne)
         if depth in spne.player_actions[player-1]:
@@ -198,6 +207,7 @@ def BACKWARD_INDUCTION(history, num_players, depth=0):
           spne1.player_actions[player][depth] = []
           spne1.player_actions[player][depth].append(a)
         temp_spne.append(spne1)
+    print(' Combining SPNE from children ' ,temp_spne[i].player_actions)
     #del list_of_spne[:]
   list_of_spne = temp_spne
 
@@ -213,12 +223,13 @@ def BACKWARD_INDUCTION(history, num_players, depth=0):
 
 spne = BACKWARD_INDUCTION(root, numPlayers)
 print(len(spne))
-# player_actions_final = []
+player_actions_final = []
+player_actions = spne[0].player_actions
 
-# for i in range (numPlayers):
-#   player_actions_final.append([])
-#   for j in range(4):
-#     if j in player_actions[i]:
-#       for action in player_actions[i][j]:
-#         player_actions_final[i].append(action)
-# print(player_actions_final)
+for i in range (numPlayers):
+  player_actions_final.append([])
+  for j in range(4):
+    if j in player_actions[i]:
+      for action in player_actions[i][j]:
+        player_actions_final[i].append(action)
+print(player_actions_final)
