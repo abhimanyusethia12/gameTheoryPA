@@ -146,15 +146,23 @@ for player in players:
     for x, y in temp1.items():
         for z in y:
             lis.append(z)
-    lis1 = Cartesian(lis, len(lis))
-    temp = []
-    for i in lis1:
-        s = ''
-        for j in i:
-            s += str(j)
-        temp.append(s)
-    player.dictionary.append(temp)
-    player.dictionary = player.dictionary[0]
+    if len(lis) == 1:
+      lis1 = lis[0]
+      temp = []
+      for i in lis1:
+        temp.append(str(i))
+      player.dictionary.append(temp)
+      player.dictionary = player.dictionary[0]
+    else:
+      lis1 = Cartesian(lis, len(lis))
+      temp = []
+      for i in lis1:
+          s = ''
+          for j in i:
+              s += str(j)
+          temp.append(s)
+      player.dictionary.append(temp)
+      player.dictionary = player.dictionary[0]
 
 for player in players:
   print (player.info_sets)
@@ -195,18 +203,29 @@ def dfs(history, depth, player_actions) :
             for j in range (len(info_sets[d])):
               temp_list.append(info_sets[d][j])
         #print(temp_list, "else")
-      final_list = Cartesian(temp_list, len(temp_list))
-      temp = []
-      for k in final_list:
-          s = ''
-          for j in k:
-              s += str(j)
-          temp.append(s)
-      final_list = temp
-      small_indices = []
-      for seq in final_list:
-        small_indices.append(curr_player.dictionary.index(seq))
-      indices.append(small_indices)
+      if len(temp_list) == 1:
+        lis1 = temp_list[0]
+        temp = []
+        for i in lis1:
+          temp.append(str(i))
+        final_list = temp
+        small_indices = []
+        for seq in final_list:
+          small_indices.append(curr_player.dictionary.index(seq))
+        indices.append(small_indices)
+      else:
+        final_list = Cartesian(temp_list, len(temp_list))
+        temp = []
+        for k in final_list:
+            s = ''
+            for j in k:
+                s += str(j)
+            temp.append(s)
+        final_list = temp
+        small_indices = []
+        for seq in final_list:
+          small_indices.append(curr_player.dictionary.index(seq))
+        indices.append(small_indices)
     
     final_indices = Cartesian(indices, len(indices))
     print (final_indices)
