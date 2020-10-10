@@ -176,6 +176,19 @@ for player in players:
 #   for a in actions:
 #     new_history = history.append()
 
+strats = []
+for player in players:
+  dim = 1
+  for item in player.info_sets.values():
+    for i in item:
+      dim = dim*len(i)
+
+  strats.append(dim)
+
+strats
+
+out = np.zeros((*strats, len(players)), dtype=np.int32)
+
 def dfs(history, depth, player_actions) :
   #print(player_actions)
   if history.node_type == 't':
@@ -228,7 +241,8 @@ def dfs(history, depth, player_actions) :
         indices.append(small_indices)
     
     final_indices = Cartesian(indices, len(indices))
-    print (final_indices)
+    for elem in final_indices:
+      out[tuple(elem)] = np.array(history.util)
   else:
     player = int(history.player)
     for i,a in enumerate(history.actions):
@@ -247,3 +261,9 @@ for i in range(numPlayers):
   player_actions.append({})
 
 dfs(root, 0, player_actions)
+
+idx = [*range(len(players)-1,-1,-1),len(players)]
+out = out.transpose(*idx).reshape((np.prod(strats)*len(players),))
+
+result = ' '.join(np.array2string(out)[1:-1].split())
+print(result)
