@@ -89,24 +89,10 @@ class Player:
         self.info_sets = {}
         self.dictionary = []
 
-file_arr = []
-with open ('./test3.efg', 'r') as f:
-  for x in f:
-    file_arr.append(x)
-
-first = EFG_first(file_arr[0])
-numPlayers = len(first.player_names)
-players = []
-
-for i in range (numPlayers):
-    temp = Player()
-    players.append(temp)
-
-def construct_tree(line_index, file_arr, d, curr = None):
+def construct_tree(line_index, file_arr, d, players, curr = None):
   if curr == None:
     curr = Node(file_arr[line_index])
   i = line_index
-  # print (i)
   if curr.node_type == 'p':
         curr_player = int(curr.player)-1
         curr_infoset = curr.info_set
@@ -127,80 +113,21 @@ def construct_tree(line_index, file_arr, d, curr = None):
 
   for action in curr.actions:
     child = Node(file_arr[i+1], action)
-    # print (child.util)
     curr.append_child(child)
     if (child.node_type == 'p'):
-      (i, _) = construct_tree(i+1, file_arr, d+1, child)
+      (i, _) = construct_tree(i+1, file_arr, d+1, players, child)
     i += 1
-  # print (curr.children)
   return (i-1, curr)
 
-# print (file_arr[2])
-(_, root) = construct_tree(2, file_arr, 0)
-
-## Code for EFG->NFG
-
-for player in players:
-    lis = []
-    temp1 = player.info_sets
-    for x, y in temp1.items():
-        for z in y:
-            lis.append(z)
-    if len(lis) == 1:
-      lis1 = lis[0]
-      temp = []
-      for i in lis1:
-        temp.append(str(i))
-      player.dictionary.append(temp)
-      player.dictionary = player.dictionary[0]
-    else:
-      lis1 = Cartesian(lis, len(lis))
-      temp = []
-      for i in lis1:
-          s = ''
-          for j in i:
-              s += str(j)
-          temp.append(s)
-      player.dictionary.append(temp)
-      player.dictionary = player.dictionary[0]
-
-for player in players:
-  print (player.info_sets)
-
-# def tree_traversal(curr, depth, history = None):
-#   if curr.node_type == 't':
-#     # do stuff
-
-#   curr_player = curr.player
-#   actions = curr.actions
-#   for a in actions:
-#     new_history = history.append()
-
-strats = []
-for player in players:
-  dim = 1
-  for item in player.info_sets.values():
-    for i in item:
-      dim = dim*len(i)
-
-  strats.append(dim)
-
-strats
-
-out = np.zeros((*strats, len(players)), dtype=np.int32)
-
-def dfs(history, depth, player_actions) :
-  #print(player_actions)
+def dfs(history, depth, player_actions, numPlayers, players, out) :
   if history.node_type == 't':
     indices = []
     for i in range (numPlayers):
       temp_list = []
       actions = player_actions[i]
-      #print (actions, i)
       curr_player = players[i]
       max_height = max(curr_player.info_sets.keys())
       info_sets = curr_player.info_sets
-      #print (curr_player, info_sets)
       for d in range(max_height+1):
         if d in actions:
           (a, info_num) = actions[d][0]
@@ -210,12 +137,10 @@ def dfs(history, depth, player_actions) :
                 temp_list.append([a])
               else:
                 temp_list.append(info_sets[d][j])
-          #print (temp_list, "if")
         else:
           if d in info_sets:
             for j in range (len(info_sets[d])):
               temp_list.append(info_sets[d][j])
-        #print(temp_list, "else")
       if len(temp_list) == 1:
         lis1 = temp_list[0]
         temp = []
@@ -253,17 +178,88 @@ def dfs(history, depth, player_actions) :
         cpy[player-1][depth] = []
         cpy[player-1][depth].append((i, history.info_set))
       if i < len(history.children):
-        dfs(history.children[i], depth+1, cpy)
+        dfs(history.children[i], depth+1, cpy, numPlayers, players, out)
 
-player_actions = []
+def efg_NFG(filename):
+    
+    file_arr = []
+    with open (filename, 'r') as f:
+        for x in f:
+            file_arr.append(x)
 
-for i in range(numPlayers):
-  player_actions.append({})
+    first = EFG_first(file_arr[0])
+    numPlayers = len(first.player_names)
+    players = []
 
-dfs(root, 0, player_actions)
+    for i in range (numPlayers):
+        temp = Player()
+        players.append(temp)
 
-idx = [*range(len(players)-1,-1,-1),len(players)]
-out = out.transpose(*idx).reshape((np.prod(strats)*len(players),))
+    (_, root) = construct_tree(2, file_arr, 0, players)
 
-result = ' '.join(np.array2string(out)[1:-1].split())
-print(result)
+    for player in players:
+        lis = []
+        temp1 = player.info_sets
+        for x, y in temp1.items():
+            for z in y:
+                lis.append(z)
+        if len(lis) == 1:
+            lis1 = lis[0]
+            temp = []
+            for i in lis1:
+                temp.append(str(i))
+            player.dictionary.append(temp)
+            player.dictionary = player.dictionary[0]
+        else:
+            lis1 = Cartesian(lis, len(lis))
+            temp = []
+            for i in lis1:
+                s = ''
+                for j in i:
+                    s += str(j)
+                temp.append(s)
+            player.dictionary.append(temp)
+            player.dictionary = player.dictionary[0]
+
+    player_actions = []
+
+    for i in range(numPlayers):
+        player_actions.append({})
+
+    strats = []
+    for player in players:
+        dim = 1
+        for item in player.info_sets.values():
+            for i in item:
+                dim = dim*len(i)
+
+        strats.append(dim)
+
+    out = np.zeros((*strats, len(players)), dtype=np.int32)
+
+    dfs(root, 0, player_actions, numPlayers, players, out)
+
+    idx = [*range(len(players)-1,-1,-1),len(players)]
+    out = out.transpose(*idx).reshape((np.prod(strats)*len(players),))
+
+    result = ' '.join(np.array2string(out)[1:-1].split())
+
+    final_ans = []
+    string_start = 'NFG 1 R ' + '"' + first.game_name + '"'
+    final_ans.append(string_start)
+    next = '{ '
+
+    for i in range (numPlayers):
+        next += '"' + first.player_names[i] + '" '
+
+    next += '} { '
+
+    for i in strats:
+        next += str(i) + ' '
+
+    next += '}'
+    final_ans.append(next)
+    final_ans.append(result)
+    print(final_ans)
+
+efg_NFG('./test2.efg')
