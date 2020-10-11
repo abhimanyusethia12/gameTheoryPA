@@ -1,8 +1,15 @@
 """Midsem Programming Assignment submission: GroupID-7"""
 
-#importing libraries 
+# DO NOT CHANGE THE NAME OF THIS SCRIPT
+
 import numpy as np
 import copy
+# DO NOT IMPORT ANY GAME THEORY RELATED PACKAGES
+
+# DO NOT CHANGE THE NAME OF ANY METHOD OR ITS INPUT OUTPUT BEHAVIOR
+# INPUT CONVENTION
+# file_name: Name of the game file either in .efg or .nfg depending on the fuction
+
 
 #class definitions
 # NFG class
@@ -17,8 +24,8 @@ class NFG():
     self.utils = []
 
   #preprocess- creates an instance of NFG class, based on input
-  def preprocess(self, filename):
-    f = open(filename, "r")
+  def preprocess(self, file_name):
+    f = open(file_name, "r")
     for j, x in enumerate(f):
       if j == 0:
         self.name = x[9:-2]
@@ -361,9 +368,9 @@ def BACKWARD_INDUCTION(history, num_players, depth=0):
   return list_of_spne
 
 #QUESTION 1
-def computeSDS(filename):
+def computeSDS(file_name):
   nfg_game = NFG()
-  nfg_game.preprocess(filename)
+  nfg_game.preprocess(file_name)
 
   sds = []
   for i in range(len(nfg_game.players)):
@@ -402,9 +409,9 @@ def computeSDS(filename):
   return sds
 
 #QUESTION 2
-def computeWDS(filename):
+def computeWDS(file_name):
   nfg_game = NFG()
-  nfg_game.preprocess(filename)
+  nfg_game.preprocess(file_name)
   
   wds = []
   for i in range(len(nfg_game.players)):
@@ -441,9 +448,9 @@ def computeWDS(filename):
   return wds
 
 #QUESTION 3
-def computePSNE(filename):
+def computePSNE(file_name):
   nfg_game = NFG()
-  nfg_game.preprocess(filename)
+  nfg_game.preprocess(file_name)
   psne = np.zeros_like(nfg_game.utils[...,0])
 
   for p in range(len(nfg_game.players)) : 
@@ -495,10 +502,10 @@ def computePSNE(filename):
   return ans
 
 #QUESTION 4
-def efg_NFG(filename):
+def efg_NFG(file_name):
     
     file_arr = []
-    with open (filename, 'r') as f:
+    with open (file_name, 'r') as f:
         for x in f:
             file_arr.append(x)
 
@@ -572,9 +579,9 @@ def efg_NFG(filename):
     return final_ans
 
 #QUESTION 5
-def computeSPNE(filename):
+def computeSPNE(file_name):
   file_arr = []
-  with open (filename, 'r') as f:
+  with open (file_name, 'r') as f:
     for x in f:
       file_arr.append(x)
 
@@ -595,7 +602,11 @@ def computeSPNE(filename):
     player_actions = s.player_actions
     for i in range (numPlayers):
       player_actions_final.append([])
-      for j in range(10):
+      num_info_sets = 0
+      for k in player_actions[i].keys():
+        if k > num_info_sets:
+          num_info_sets = k
+      for j in range(num_info_sets+1):
         if j in player_actions[i]:
           player_actions_final[i].append(player_actions[i][j])
     ans.append(player_actions_final)
