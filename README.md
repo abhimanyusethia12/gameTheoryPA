@@ -1,7 +1,4 @@
 # gameTheoryPA
-Programming assignment of CS711
+Programming assignment done as a part of the course on Game Theory and Mechanism Design (CS711).
 
-# Minutes of 1st Meeting (7/10/20)
-* make parser
-input- GAMBIT format file
-output- n dimensional array, player dict
+
