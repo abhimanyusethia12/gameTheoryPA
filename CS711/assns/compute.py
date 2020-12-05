@@ -14,6 +14,7 @@ import copy
 #class definitions
 # NFG class
 class NFG():
+  
   def __init__(self):
     self.gameType = "NFG"
     self.version = 1
@@ -390,6 +391,7 @@ def computeSDS(file_name):
 
       if l%nfg_game.strats[i] == nfg_game.strats[i] - 1:
         if len(maxind) != 1:
+          best = -1
           break
         else:
           if best == -2:
